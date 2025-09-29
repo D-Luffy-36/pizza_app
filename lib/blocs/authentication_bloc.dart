@@ -24,16 +24,17 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       AuthenticationUserChanged event,
       Emitter<AuthenticationState> emit,
       ) {
+    print("Authenticated user: ${event.user}");
+
     if (event.user == null) {
+      // user null => chưa login
       emit(const AuthenticationState.unauthenticated());
-    }
-    else if(event.user == MyUser.empty) {
-      emit(const AuthenticationState.unknown());
-    }
-    else {
+    } else {
+      // có user => login thành công
       emit(AuthenticationState.authenticated(event.user!));
     }
   }
+
 
   @override
   Future<void> close() {

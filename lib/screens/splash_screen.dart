@@ -32,7 +32,7 @@ class SplashScreen extends StatelessWidget {
     return const Icon(
       Icons.local_pizza,
       size: 100,
-      color: Colors.white,
+      color: Colors.deepOrange,
     );
   }
 
@@ -43,7 +43,7 @@ class SplashScreen extends StatelessWidget {
       style: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: Colors.deepOrange,
         letterSpacing: 1.2,
       ),
     );
@@ -55,7 +55,7 @@ class SplashScreen extends StatelessWidget {
       "Đang khởi động...",
       style: TextStyle(
         fontSize: 16,
-        color: Colors.white70,
+        color: Colors.deepOrange,
       ),
     );
   }
@@ -63,7 +63,7 @@ class SplashScreen extends StatelessWidget {
   // Loading indicator
   Widget _buildLoading() {
     return const CircularProgressIndicator(
-      color: Colors.white,
+      color: Colors.deepOrange,
       strokeWidth: 2.5,
     );
   }

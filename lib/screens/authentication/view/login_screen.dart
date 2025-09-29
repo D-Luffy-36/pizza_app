@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_repository/user_repository.dart';
 
+import '../../screen.dart';
 import '../blocs/sign_in_bloc/sign_in_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -53,7 +54,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.of(context, rootNavigator: true).pop();
 
                     if (state is SignInSuccess) {
-                      Navigator.pushReplacementNamed(context, "/home");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Đăng nhập thành công!')),
+                      );
                     } else if (state is SignInFailure) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(state.errorMessage)),
@@ -83,9 +86,9 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 16),
         _buildTitle(),
         const SizedBox(height: 24),
-        _buildEmailField(),
+        _buildEmailField(emailController),
         const SizedBox(height: 16),
-        _buildPasswordField(),
+        _buildPasswordField(passwordController),
         const SizedBox(height: 24),
         _buildLoginButton(context),
         const SizedBox(height: 16),
@@ -116,9 +119,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // Email input
-  Widget _buildEmailField() {
-    return const TextField(
-      decoration: InputDecoration(
+  Widget _buildEmailField(TextEditingController emailController) {
+    return TextField(
+      controller: emailController,
+      decoration: const InputDecoration(
         labelText: "Email",
         border: OutlineInputBorder(),
         prefixIcon: Icon(Icons.email_outlined),
@@ -127,10 +131,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // Password input
-  Widget _buildPasswordField() {
-    return const TextField(
+  Widget _buildPasswordField(TextEditingController passwordController) {
+    return TextField(
       obscureText: true,
-      decoration: InputDecoration(
+      controller: passwordController,
+      decoration: const InputDecoration(
         labelText: "Mật khẩu",
         border: OutlineInputBorder(),
         prefixIcon: Icon(Icons.lock_outline),
@@ -140,10 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Login button
   Widget _buildLoginButton(BuildContext context) {
-    String email = emailController.text;
-    String password = passwordController.text;
+
     return ElevatedButton(
       onPressed: () {
+        final email = emailController.text.trim();
+        final password = passwordController.text.trim();
         // TODO: handle login
         context.read<SignInBloc>().add(
           SignInWithEmailAndPasswordRequested(email: email, password: password),

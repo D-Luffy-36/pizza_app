@@ -6,18 +6,10 @@ import 'blocs/authentication_bloc.dart';
 
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Lấy UserRepository từ RepositoryProvider cao nhất
-    final userRepository = context.read<UserRepository>();
-    return  BlocProvider(
-      create: (context) => AuthenticationBloc(
-        userRepository: userRepository,
-      ),
-      child: const MyAppView(),
-    );
+    return const MyAppView(); // Không cần wrap BlocProvider nữa
   }
 }

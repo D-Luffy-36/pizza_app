@@ -4,7 +4,6 @@ import 'blocs/authentication_bloc.dart';
 import 'blocs/authentication_state.dart';
 import 'screens/screen.dart';
 
-
 class MyAppView extends StatelessWidget {
   const MyAppView({super.key});
 
@@ -12,20 +11,37 @@ class MyAppView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(fontFamily: 'Inter'),
+      theme: ThemeData(
+        primaryColor: Colors.deepOrange,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Colors.deepOrange,
+          secondary: Colors.deepOrangeAccent,
+        ),
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.deepOrange,
+          foregroundColor: Colors.white, // màu chữ/icon trong AppBar
+          elevation: 0,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepOrange,
+          ),
+        ),
+      ),
       home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
           switch (state.status) {
-            case AuthenticationStatus.unknown:
-              return const SplashScreen();
             case AuthenticationStatus.authenticated:
-              return HomeScreen();
+              return const HomeScreen();
             case AuthenticationStatus.unauthenticated:
               return const LoginScreen();
+            default:
+              return const SplashScreen(); // chỉ khi app mới load
           }
         },
-      ),
+      )
+      ,
     );
   }
 }
-

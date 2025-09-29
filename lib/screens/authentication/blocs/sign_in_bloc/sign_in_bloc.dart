@@ -19,6 +19,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
       SignInWithEmailAndPasswordRequested event,
       Emitter<SignInState> emit,
       ) async {
+    print("email: ${event.email}, password: ${event.password}");
     emit(SignInLoading());
     try {
       await _userRepository.signIn(

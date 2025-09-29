@@ -15,19 +15,28 @@ class FirebaseUserRepository implements UserRepository {
   FirebaseUserRepository({FirebaseAuth? firebaseAuth})
       : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
-@override
-  Stream<MyUser?>  user() => _firebaseAuth.authStateChanges().asyncMap(
-    (firebaseUser) async {
-      if (firebaseUser == null) return MyUser.empty;
+  @override
+  Stream<MyUser?> user() => _firebaseAuth.authStateChanges().asyncMap(
+        (firebaseUser) async {
+      print("FirebaseUser in repo: $firebaseUser");
+      if (firebaseUser == null) return null; // chưa login
 
       try {
         final userSnapshot = await usersCollection.doc(firebaseUser.uid).get();
-        if (!userSnapshot.exists) return MyUser.empty;
-
+        if (!userSnapshot.exists) {
+          // chưa có document → tạo user tạm bằng FirebaseAuth
+          return MyUser(
+            userId: firebaseUser.uid,
+            email: firebaseUser.email ?? 'unknown',
+            name: firebaseUser.displayName ?? 'unknown',
+            hasActiveCart: false,
+          );
+        }
         final userEntity = MyUserEntity.fromDocument(userSnapshot.data()!);
         return MyUser.fromEntity(userEntity);
-      } catch (_) {
-        return MyUser.empty;
+      } catch (e) {
+        // ❌ đừng trả MyUser.empty nữa, coi như null → bắt buộc login lại
+        return null;
       }
     },
   );
@@ -52,9 +61,7 @@ class FirebaseUserRepository implements UserRepository {
         hasActiveCart: false,
       );
 
-      await usersCollection
-          .doc(firebaseUser.uid)
-          .set(userEntity.toDocument());
+      await usersCollection.doc(firebaseUser.uid).set(userEntity.toDocument());
 
       return MyUser.fromEntity(userEntity);
     } catch (e) {
@@ -68,11 +75,13 @@ class FirebaseUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> signIn(String email, String password) {
-    return _firebaseAuth.signInWithEmailAndPassword(
-        email: email, password: password);
+  @override
+  Future<void> signIn(String email, String password) async {
+    await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
-
 
   @override
   Future<void> setUserData(MyUser myUser) async {
@@ -84,5 +93,4 @@ class FirebaseUserRepository implements UserRepository {
       rethrow;
     }
   }
-
 }
