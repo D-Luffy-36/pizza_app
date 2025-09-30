@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_app/screens/authentication/blocs/sign_in_bloc/sign_in_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 
 // Class MyApp gốc của bạn
 class HomeScreen extends StatelessWidget {
 
   const HomeScreen({super.key});
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,13 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: const Color(0xFFF3F4F6), // gray-100
 
         // Sử dụng CustomAppBar đã thiết kế lại
-        appBar: const CustomAppBar(title: "Demo Flutter Đẹp Hơn"),
+        appBar:  CustomAppBar(
+          title: "Home Screen",
+          onLogout: () {
+            context.read<SignInBloc>().add(SignOutRequired());
+          },
+        ),
+
 
         body: Center(
           // Sử dụng InfoCard thay vì Text("hello")
@@ -32,15 +41,15 @@ class HomeScreen extends StatelessWidget {
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final VoidCallback? onLogout;
 
-  const CustomAppBar({super.key, required this.title});
+  const CustomAppBar({super.key, required this.title, this.onLogout});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      // Tông màu tối cho AppBar
-      backgroundColor: const Color(0xFF1F2937), // gray-800
-      elevation: 8, // Thêm bóng đổ nhẹ
+      backgroundColor: const Color(0xFF1F2937),
+      elevation: 8,
       centerTitle: true,
       title: Text(
         title,
@@ -53,7 +62,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         icon: const Icon(Icons.person_outline, color: Colors.white),
         onPressed: () {
-          // Xử lý sự kiện profile
+          // TODO: Xử lý mở profile
+          print("Mở profile");
         },
       ),
       actions: [
@@ -61,13 +71,29 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.notifications_none, color: Colors.white),
           onPressed: () {
             // Xử lý sự kiện thông báo
+            print("Thông báo");
           },
         ),
         IconButton(
           icon: const Icon(Icons.settings_outlined, color: Colors.white),
           onPressed: () {
             // Xử lý sự kiện cài đặt
+            print("Cài đặt");
           },
+        ),
+        // Nút Logout trực tiếp
+        TextButton.icon(
+          onPressed: () {
+            // TODO: Xử lý logout
+            // Dispatch event logout
+            onLogout!();
+            print("Đăng xuất thành công");
+          },
+          icon: const Icon(Icons.logout, color: Colors.white),
+          label: const Text(
+            "Logout",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
         const SizedBox(width: 8),
       ],
@@ -138,12 +164,14 @@ class InfoCard extends StatelessWidget {
                 // Xử lý sự kiện chi tiết
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo.shade600, // indigo-600
+                backgroundColor: Colors.indigo.shade600,
+                // indigo-600
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                minimumSize: const Size(double.infinity, 50), // Nút rộng tối đa
+                minimumSize: const Size(double.infinity, 50),
+                // Nút rộng tối đa
                 elevation: 6,
               ),
               child: const Text(

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_repository/user_repository.dart';
-
-import '../../screen.dart';
 import '../blocs/sign_in_bloc/sign_in_bloc.dart';
+import '../widgets/widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,7 +14,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
+  @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
@@ -24,157 +25,115 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    final size = MediaQuery.of(context).size;
 
-      create: (context) => SignInBloc(
-        userRepository: context.read<UserRepository>(), // giờ lấy được
-      ),
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF3F4F6), // gray-100
-        body: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Card(
-              elevation: 12,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: BlocListener<SignInBloc, SignInState>(
-                listener: (context, state) {
-                  if (state is SignInLoading) {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder:
-                          (context) =>
-                              const Center(child: CircularProgressIndicator()),
-                    );
-                  } else {
-                    // Đóng dialog nếu đang mở
-                    Navigator.of(context, rootNavigator: true).pop();
-
-                    if (state is SignInSuccess) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Đăng nhập thành công!')),
-                      );
-                    } else if (state is SignInFailure) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(state.errorMessage)),
-                      );
-                    }
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [_buildLoginForm(context)],
-                  ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF3F4F6),
+      body: BlocConsumer<SignInBloc, SignInState>(
+        listener: (context, state) {
+          if (state is SignInSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Đăng nhập thành công!")),
+            );
+            // Nếu dùng AuthWrapper, app sẽ tự điều hướng
+          } else if (state is SignInFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorMessage)),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: SizedBox(
+                  width: size.width * 0.9,
+                  height: size.height * 0.5,
+                  child: _buildLoginForm(context),
                 ),
               ),
-            ),
-          ),
-        ),
+              if (state is SignInLoading)
+                Container(
+                  color: Colors.black45,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
 
   Widget _buildLoginForm(BuildContext context) {
-    return Column(
-      children: [
-        _buildLogo(),
-        const SizedBox(height: 16),
-        _buildTitle(),
-        const SizedBox(height: 24),
-        _buildEmailField(emailController),
-        const SizedBox(height: 16),
-        _buildPasswordField(passwordController),
-        const SizedBox(height: 24),
-        _buildLoginButton(context),
-        const SizedBox(height: 16),
-        _buildRegisterLink(),
-      ],
-    );
-  }
-
-  // 🍕 Logo
-  Widget _buildLogo() {
-    return const Icon(
-      Icons.local_pizza, // đổi thành pizza icon
-      size: 80,
-      color: Colors.deepOrange,
-    );
-  }
-
-  // Title
-  Widget _buildTitle() {
-    return const Text(
-      "Đăng nhập Pizza",
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.deepOrange,
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 16),
+          _buildEmailField(emailController),
+          const SizedBox(height: 16),
+          _buildPasswordField(passwordController),
+          const SizedBox(height: 24),
+          _buildLoginButton(context),
+        ],
       ),
     );
   }
 
-  // Email input
   Widget _buildEmailField(TextEditingController emailController) {
-    return TextField(
+    return MyTextField(
+      labelText: "Email",
       controller: emailController,
-      decoration: const InputDecoration(
-        labelText: "Email",
-        border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.email_outlined),
-      ),
+      isPassword: false,
+      validator: (v) {
+        if (v == null || v.isEmpty) return "Email không được để trống";
+        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v))
+          return "Email không hợp lệ";
+        return null;
+      },
+      prefixIcon: Icons.email_outlined,
     );
   }
 
-  // Password input
   Widget _buildPasswordField(TextEditingController passwordController) {
-    return TextField(
-      obscureText: true,
+    return MyTextField(
+      labelText: "Mật khẩu",
       controller: passwordController,
-      decoration: const InputDecoration(
-        labelText: "Mật khẩu",
-        border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.lock_outline),
-      ),
+      isPassword: true,
+      validator: (v) => v == null || v.length < 6 ? "Mật khẩu >= 6 ký tự" : null,
+      prefixIcon: Icons.lock_outline,
     );
   }
 
-  // Login button
   Widget _buildLoginButton(BuildContext context) {
-
-    return ElevatedButton(
-      onPressed: () {
-        final email = emailController.text.trim();
-        final password = passwordController.text.trim();
-        // TODO: handle login
-        context.read<SignInBloc>().add(
-          SignInWithEmailAndPasswordRequested(email: email, password: password),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.deepOrange,
-        foregroundColor: Colors.white,
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            context.read<SignInBloc>().add(
+              SignInWithEmailAndPasswordRequested(
+                email: emailController.text.trim(),
+                password: passwordController.text.trim(),
+              ),
+            );
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepOrange,
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: const Text(
+          "Đăng nhập",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
       ),
-      child: const Text(
-        "Đăng nhập",
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-      ),
-    );
-  }
-
-  // Register link
-  Widget _buildRegisterLink() {
-    return TextButton(
-      onPressed: () {
-        // TODO: handle register navigation
-      },
-      child: const Text("Chưa có tài khoản? Đăng ký"),
     );
   }
 }

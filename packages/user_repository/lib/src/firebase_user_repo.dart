@@ -54,6 +54,7 @@ class FirebaseUserRepository implements UserRepository {
       }
 
       // 2️⃣ Lưu thông tin chi tiết user vào Firestore
+      // to Entity
       final userEntity = MyUserEntity(
         userId: firebaseUser.uid,
         email: myUser.email,

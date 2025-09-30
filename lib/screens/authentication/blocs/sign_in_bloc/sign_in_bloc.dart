@@ -13,6 +13,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
       : _userRepository = userRepository,
         super(SignInInitial()) {
     on<SignInWithEmailAndPasswordRequested>(_onSignInWithEmailAndPasswordRequested);
+    on<SignOutRequired>(_onSignOutRequested);
   }
 
   Future<void> _onSignInWithEmailAndPasswordRequested(
@@ -30,5 +31,10 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     } catch (e) {
       emit(SignInFailure(e.toString()));
     }
+  }
+
+  _onSignOutRequested(SignOutRequired event, Emitter<SignInState> emit) async {
+    await _userRepository.logOut();
+    emit(SignInInitial());
   }
 }

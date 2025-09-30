@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/authentication_bloc.dart';
 import 'blocs/authentication_state.dart';
+import 'screens/authentication/view/welcom_screen.dart';
 import 'screens/screen.dart';
 
 class MyAppView extends StatelessWidget {
@@ -35,7 +36,7 @@ class MyAppView extends StatelessWidget {
             case AuthenticationStatus.authenticated:
               return const HomeScreen();
             case AuthenticationStatus.unauthenticated:
-              return const LoginScreen();
+              return const WelcomeScreen();
             default:
               return const SplashScreen(); // chỉ khi app mới load
           }
