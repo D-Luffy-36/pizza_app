@@ -8,6 +8,7 @@ class MyTextField extends StatefulWidget {
   final Validator? validator;
   final bool isPassword; // thêm flag xác định đây có phải password hay không
   final IconData? prefixIcon;
+  final ValueChanged<String>? onChanged;
 
   const MyTextField({
     super.key,
@@ -16,6 +17,7 @@ class MyTextField extends StatefulWidget {
     this.validator,
     this.isPassword = false, // default false
     this.prefixIcon,
+    this.onChanged,
   });
 
   @override
@@ -53,7 +55,10 @@ class _MyTextFieldState extends State<MyTextField> {
         )
             : null,
       ),
+      onChanged: widget.onChanged,
       validator: widget.validator,
     );
   }
 }
+
+

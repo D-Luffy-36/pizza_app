@@ -12,24 +12,7 @@ class MyAppView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.deepOrange,
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: Colors.deepOrange,
-          secondary: Colors.deepOrangeAccent,
-        ),
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.deepOrange,
-          foregroundColor: Colors.white, // màu chữ/icon trong AppBar
-          elevation: 0,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepOrange,
-          ),
-        ),
-      ),
+      theme: ThemeData(colorScheme: ColorScheme.light(background: Colors.grey.shade200, onBackground: Colors.black, primary: Colors.blue, onPrimary: Colors.white)),
       home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
           switch (state.status) {

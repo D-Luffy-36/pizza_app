@@ -16,3 +16,5 @@ class AuthenticationUserChanged extends AuthenticationEvent {
   const AuthenticationUserChanged(this.user);
 
 }
+
+class LoggedOut extends AuthenticationEvent {}

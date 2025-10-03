@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 import 'package:user_repository/user_repository.dart';
-
 part 'sign_in_event.dart';
 part 'sign_in_state.dart';
 
@@ -13,7 +12,6 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
       : _userRepository = userRepository,
         super(SignInInitial()) {
     on<SignInWithEmailAndPasswordRequested>(_onSignInWithEmailAndPasswordRequested);
-    on<SignOutRequired>(_onSignOutRequested);
   }
 
   Future<void> _onSignInWithEmailAndPasswordRequested(
@@ -33,8 +31,4 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     }
   }
 
-  _onSignOutRequested(SignOutRequired event, Emitter<SignInState> emit) async {
-    await _userRepository.logOut();
-    emit(SignInInitial());
-  }
 }

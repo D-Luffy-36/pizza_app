@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_repository/user_repository.dart';
 import '../blocs/sign_up_bloc/sign_up_bloc.dart';
-import '../widgets/my_text_field.dart';
+import '../cubits/password_vadilation/password_vadilation_cubit.dart';
+import '../../../components/my_text_field.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -29,8 +30,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SignUpBloc(userRepository: context.read<UserRepository>()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<SignUpBloc>(
+          create:
+              (context) =>
+                  SignUpBloc(userRepository: context.read<UserRepository>()),
+        ),
+        BlocProvider(create: (_) => PasswordVadilationCubit()),
+      ],
       child: Scaffold(
         backgroundColor: const Color(0xFFF3F4F6),
         body: BlocConsumer<SignUpBloc, SignUpState>(
@@ -40,9 +48,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SnackBar(content: Text("Đăng ký thành công!")),
               );
             } else if (state is SignUpFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
             }
           },
           builder: (context, state) {
@@ -60,7 +68,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         const SizedBox(height: 16),
                         _buildEmailField(),
                         const SizedBox(height: 16),
-                        _buildPasswordField(),
+                        _buildPasswordField(context),
+                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
+                        _buildPasswordRequirements(context),// 👈 thêm Row ở đây
                         const SizedBox(height: 16),
                         _buildConfirmPasswordField(),
                         const SizedBox(height: 24),
@@ -74,9 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 if (state is SignUpLoading)
                   Container(
                     color: Colors.black45,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    child: const Center(child: CircularProgressIndicator()),
                   ),
               ],
             );
@@ -96,6 +105,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  Widget _buildPasswordField(BuildContext context) {
+    return MyTextField(
+      labelText: "Mật khẩu",
+      controller: passwordController,
+      isPassword: true,
+      prefixIcon: Icons.lock_outline,
+      onChanged: (value) {
+        context.read<PasswordVadilationCubit>().validate(
+          value,
+        ); // ✅ trigger cubit
+      },
+    );
+  }
+
   Widget _buildEmailField() {
     return MyTextField(
       labelText: "Email",
@@ -108,16 +131,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return null;
       },
       prefixIcon: Icons.email_outlined,
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return MyTextField(
-      labelText: "Mật khẩu",
-      controller: passwordController,
-      isPassword: true,
-      validator: (v) => v == null || v.length < 6 ? "Mật khẩu >= 6 ký tự" : null,
-      prefixIcon: Icons.lock_outline,
+      onChanged: (value) {},
     );
   }
 
@@ -126,8 +140,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       labelText: "Xác nhận mật khẩu",
       controller: confirmController,
       isPassword: true,
-      validator: (v) => v != passwordController.text ? "Mật khẩu không khớp" : null,
+      validator:
+          (v) => v != passwordController.text ? "Mật khẩu không khớp" : null,
       prefixIcon: Icons.lock_outline,
+      onChanged: (value) {},
     );
   }
 
@@ -165,4 +181,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+}
+
+Widget _buildRequirement(String text, bool satisfied) {
+  return Row(
+    children: [
+      Icon(
+        satisfied ? Icons.check_circle : Icons.cancel,
+        size: 16,
+        color: satisfied ? Colors.green : Colors.red,
+      ),
+      const SizedBox(width: 6),
+      Text(
+        text,
+        style: TextStyle(
+          fontSize: 13,
+          color: satisfied ? Colors.green : Colors.red,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildPasswordRequirements(BuildContext context) {
+  return BlocBuilder<PasswordVadilationCubit, PasswordValidationState>(
+    builder: (context, state) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildRequirement("Ít nhất 1 chữ hoa (A-Z)", state.upper),
+                _buildRequirement("Ít nhất 1 chữ thường (a-z)", state.lower),
+                _buildRequirement("Ít nhất 1 số (0-9)", state.number),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Column(
+              children: [
+                _buildRequirement("Ít nhất 1 ký tự đặc biệt", state.special),
+                _buildRequirement("Độ dài ≥ 8 ký tự", state.min8),
+              ],
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }

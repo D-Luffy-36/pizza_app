@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_repository/user_repository.dart';
+import '../../../components/my_text_field.dart';
 import '../blocs/sign_in_bloc/sign_in_bloc.dart';
-import '../widgets/widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

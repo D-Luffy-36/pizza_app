@@ -22,5 +22,5 @@ final class SignInWithEmailAndPasswordRequested extends SignInEvent {
   List<Object> get props => [email, password];
 }
 
-class SignOutRequired extends SignInEvent {}
+final class SignOutRequired extends SignInEvent {}
 

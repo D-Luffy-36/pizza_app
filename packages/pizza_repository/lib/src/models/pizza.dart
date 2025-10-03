@@ -51,7 +51,6 @@ class Pizza {
     );
   }
 
-
   PizzaEntity toEntity() {
     return PizzaEntity(
       pizzaId: pizzaId,

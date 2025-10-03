@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:user_repository/user_repository.dart';
+import '../blocs/sign_in_bloc/sign_in_bloc.dart';
 import './login_screen.dart';
 import './sign_up_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -20,10 +23,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
+          SizedBox(height: size.height * 0.1),
           TabBar(
             controller: tabController,
             labelColor: Colors.deepOrange,
@@ -37,8 +43,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
           Expanded(
             child: TabBarView(
               controller: tabController,
-              children: const [
-                LoginScreen(),
+              children: [
+                BlocProvider(
+                  create: (context) => SignInBloc(
+                    userRepository: context.read<UserRepository>(),
+                  ),
+                  child: LoginScreen(),
+                ),
                 SignUpScreen(),
               ],
             ),

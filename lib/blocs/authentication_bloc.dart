@@ -14,6 +14,11 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     // Đăng ký handler trước
     on<AuthenticationUserChanged>(_onAuthenticationUserChanged);
 
+    on<LoggedOut>((LoggedOut event, Emitter<AuthenticationState> emit) async {
+      await _userRepository.logOut();
+      emit(const AuthenticationState.unauthenticated());
+    });
+
     // Lắng nghe user từ repo
     _streamSubscription = _userRepository.user().listen((myUser) {
       add(AuthenticationUserChanged(myUser));

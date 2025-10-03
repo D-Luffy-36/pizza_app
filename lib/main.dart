@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pizza_app/app.dart';
 import 'package:pizza_app/screens/authentication/blocs/sign_in_bloc/sign_in_bloc.dart';
 import 'package:pizza_app/screens/authentication/blocs/sign_up_bloc/sign_up_bloc.dart';
+import 'package:pizza_app/screens/home/bloc/get_pizza_bloc.dart';
 import 'package:pizza_app/simple_bloc_observer.dart';
+import 'package:pizza_repository/pizza_repository.dart';
 import 'package:user_repository/user_repository.dart';
 import 'app_view.dart';
 import 'blocs/authentication_bloc.dart';
@@ -18,6 +20,7 @@ void main() async {
   Bloc.observer = SimpleBlocObserver();
 
   final userRepository = FirebaseUserRepository();
+  final pizzaRepository = FirebasePizzaRepository();
 
   runApp(
     RepositoryProvider<UserRepository>.value(
@@ -31,10 +34,7 @@ void main() async {
                 ),
           ),
           BlocProvider(
-            create:
-                (context) => SignInBloc(
-              userRepository: context.read<UserRepository>(),
-            ),
+            create: (_) => GetPizzaBloc(pizzaRepository: pizzaRepository),
           ),
         ],
         child: const MyApp(),
