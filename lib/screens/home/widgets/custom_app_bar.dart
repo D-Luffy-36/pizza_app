@@ -32,7 +32,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(width: 8),
           const Text(
             'PIZZA',
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24),
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 30,
+              color: Colors.black,
+              shadows: [
+                Shadow(
+                  offset: Offset(3, 3),
+                  blurRadius: 4,
+                  color: Colors.orangeAccent,
+                ),
+              ],
+            ),
           ),
         ],
       ),

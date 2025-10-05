@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pizza_app/app.dart';
+import 'package:pizza_app/provider/responsive_provider.dart';
 import 'package:pizza_app/screens/authentication/blocs/sign_in_bloc/sign_in_bloc.dart';
 import 'package:pizza_app/screens/authentication/blocs/sign_up_bloc/sign_up_bloc.dart';
 import 'package:pizza_app/screens/home/bloc/get_pizza_bloc.dart';
@@ -12,6 +13,9 @@ import 'app_view.dart';
 import 'blocs/authentication_bloc.dart';
 import 'blocs/authentication_event.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import 'config/responsive_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +40,9 @@ void main() async {
           BlocProvider(
             create: (_) => GetPizzaBloc(pizzaRepository: pizzaRepository),
           ),
+
         ],
+        // 👉 Gắn ResponsiveProvider ở đây
         child: const MyApp(),
       ),
     ),

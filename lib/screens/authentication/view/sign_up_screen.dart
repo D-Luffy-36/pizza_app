@@ -184,52 +184,51 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 Widget _buildRequirement(String text, bool satisfied) {
-  return Row(
-    children: [
-      Icon(
-        satisfied ? Icons.check_circle : Icons.cancel,
-        size: 16,
-        color: satisfied ? Colors.green : Colors.red,
-      ),
-      const SizedBox(width: 6),
-      Text(
-        text,
-        style: TextStyle(
-          fontSize: 13,
-          color: satisfied ? Colors.green : Colors.red,
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2.0), // thêm khoảng cách dọc
+    child: Row(
+      children: [
+        Icon(
+          satisfied ? Icons.check_circle : Icons.radio_button_unchecked,
+          size: 18,
+          color: satisfied ? Colors.green : Colors.grey, // xanh nếu đạt, xám nếu chưa
         ),
-      ),
-    ],
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 13,
+            color: satisfied ? Colors.green : Colors.grey,
+            fontWeight: satisfied ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ],
+    ),
   );
 }
 
 Widget _buildPasswordRequirements(BuildContext context) {
   return BlocBuilder<PasswordVadilationCubit, PasswordValidationState>(
     builder: (context, state) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildRequirement("Ít nhất 1 chữ hoa (A-Z)", state.upper),
-                _buildRequirement("Ít nhất 1 chữ thường (a-z)", state.lower),
-                _buildRequirement("Ít nhất 1 số (0-9)", state.number),
-              ],
-            ),
+      return Card(
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Yêu cầu mật khẩu:",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 8),
+              _buildRequirement("Ít nhất 1 chữ hoa (A-Z)", state.upper),
+              _buildRequirement("Ít nhất 1 chữ thường (a-z)", state.lower),
+              _buildRequirement("Ít nhất 1 số (0-9)", state.number),
+              _buildRequirement("Ít nhất 1 ký tự đặc biệt", state.special),
+              _buildRequirement("Độ dài ≥ 8 ký tự", state.min8),
+            ],
           ),
-          Expanded(
-            flex: 1,
-            child: Column(
-              children: [
-                _buildRequirement("Ít nhất 1 ký tự đặc biệt", state.special),
-                _buildRequirement("Độ dài ≥ 8 ký tự", state.min8),
-              ],
-            ),
-          ),
-        ],
+        ),
       );
     },
   );
